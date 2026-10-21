@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Huayco ALERT - Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        darkbg: '#0f172a',
+                        cardbg: '#1e293b',
+                    },
+                    animation: {
+                        'pulse-fast': 'pulse 1s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Custom range slider styling */
+        input[type=range] {
+            -webkit-appearance: none;
+            width: 100%;
+            background: transparent;
+        }
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            height: 16px;
+            width: 16px;
+            border-radius: 50%;
+            background: #3b82f6;
+            cursor: pointer;
+            margin-top: -6px;
+            box-shadow: 0 0 5px rgba(0,0,0,0.5);
+        }
+        input[type=range]::-webkit-slider-runnable-track {
+            width: 100%;
+            height: 4px;
+            cursor: pointer;
+            background: #475569;
+            border-radius: 2px;
+        }
+        .alert-transition {
+            transition: all 0.3s ease-in-out;
+        }
+    </style>
+</head>
+<body class="bg-darkbg text-slate-200 min-h-screen p-4 md:p-8">
+
+    <div class="max-w-6xl mx-auto space-y-6">
+        <!-- Header -->
+        <header class="flex flex-col md:flex-row justify-between items-center bg-cardbg p-6 rounded-2xl shadow-lg border border-slate-700">
+            <div>
+                <h1 class="text-3xl font-bold text-white tracking-tight">Huayco <span class="text-blue-500">ALERT</span></h1>
+                <p class="text-slate-400 text-sm mt-1">Centro de Monitoreo Distribuido (ESP-NOW) - Hito 2</p>
+            </div>
+            
+            <!-- Alert State Banner -->
+            <div id="alertBanner" class="mt-4 md:mt-0 px-8 py-3 rounded-xl font-bold text-xl tracking-wider uppercase alert-transition bg-slate-700 text-slate-300 border-2 border-slate-600">
+                Estado: Normal
+            </div>
+        </header>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            
+            <!-- Telemetry Section -->
+            <div class="lg:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-4">
+                
+                <!-- Card: Humedad -->
+                <div class="bg-cardbg p-5 rounded-2xl border border-slate-700 shadow-md">
+                    <div class="flex justify-between items-center mb-2">
+                        <span class="text-sm font-semibold text-slate-400 uppercase">Humedad Suelo Profundo</span>
+                        <svg class="w-5 h-5 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"></path></svg>
+                    </div>
+                    <div class="text-3xl font-bold text-white mb-4"><span id="valHumedad">45</span> <span class="text-lg text-slate-500">%</span></div>
+                    <input type="range" id="simHumedad" min="0" max="100" value="45" class="w-full">
+                </div>
+
+                <!-- Card: Lluvia -->
+                <div class="bg-cardbg p-5 rounded-2xl border border-slate-700 shadow-md">
+                    <div class="flex justify-between items-center mb-2">
+                        <span class="text-sm font-semibold text-slate-400 uppercase">Intensidad Lluvia</span>
+                        <svg class="w-5 h-5 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z"></path></svg>
+                    </div>
+                    <div class="text-3xl font-bold text-white mb-4"><span id="valLluvia">0.0</span> <span class="text-lg text-slate-500">mm/h</span></div>
+                    <input type="range" id="simLluvia" min="0" max="50" step="0.5" value="0" class="w-full">
+                </div>
+
+                <!-- Card: Variacion Presion -->
+                <div class="bg-cardbg p-5 rounded-2xl border border-slate-700 shadow-md">
+                    <div class="flex justify-between items-center mb-2">
+                        <span class="text-sm font-semibold text-slate-400 uppercase">Pendiente Barométrica (ΔP/Δt)</span>
+                        <svg class="w-5 h-5 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 17h8m0 0V9m0 8l-8-8-4 4-6-6"></path></svg>
+                    </div>
+                    <div class="text-3xl font-bold text-white mb-4"><span id="valDeltaP">0.20</span> <span class="text-lg text-slate-500">hPa/h</span></div>
+                    <input type="range" id="simDeltaP" min="0" max="3" step="0.05" value="0.2" class="w-full">
+                </div>
+
+                <!-- Card: Aceleracion -->
+                <div class="bg-cardbg p-5 rounded-2xl border border-slate-700 shadow-md">
+                    <div class="flex justify-between items-center mb-2">
+                        <span class="text-sm font-semibold text-slate-400 uppercase">Aceleración Suelo (MPU6050)</span>
+                        <svg class="w-5 h-5 text-orange-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                    </div>
+                    <div class="text-3xl font-bold text-white mb-4"><span id="valAcel">0.1</span> <span class="text-lg text-slate-500">m/s²</span></div>
+                    <input type="range" id="simAcel" min="0" max="5" step="0.1" value="0.1" class="w-full">
+                </div>
+
+                <!-- Card: Presion Absoluta -->
+                <div class="bg-cardbg p-5 rounded-2xl border border-slate-700 shadow-md">
+                    <div class="flex justify-between items-center mb-2">
+                        <span class="text-sm font-semibold text-slate-400 uppercase">Presión Absoluta</span>
+                        <span class="text-slate-500 text-xs">Info Extra</span>
+                    </div>
+                    <div class="text-3xl font-bold text-white mb-4"><span id="valPresion">1012</span> <span class="text-lg text-slate-500">hPa</span></div>
+                    <input type="range" id="simPresion" min="950" max="1050" value="1012" class="w-full">
+                </div>
+
+                <!-- Card: Eventos Lluvia -->
+                <div class="bg-cardbg p-5 rounded-2xl border border-slate-700 shadow-md">
+                    <div class="flex justify-between items-center mb-2">
+                        <span class="text-sm font-semibold text-slate-400 uppercase">Frecuencia Lluvia</span>
+                        <span class="text-slate-500 text-xs">Eventos</span>
+                    </div>
+                    <div class="text-3xl font-bold text-white mb-4"><span id="valConteo">0</span></div>
+                    <input type="range" id="simConteo" min="0" max="100" value="0" class="w-full">
+                </div>
+
+            </div>
+
+            <!-- Control Section -->
+            <div class="bg-cardbg p-6 rounded-2xl border border-slate-700 shadow-md flex flex-col">
+                <h2 class="text-xl font-bold text-white mb-6 border-b border-slate-600 pb-2">Panel de Control</h2>
+                
+                <!-- Toggle Mode -->
+                <div class="flex items-center justify-between mb-8 bg-slate-900 p-4 rounded-xl border border-slate-700">
+                    <span class="font-semibold text-slate-300">Modo de Evaluación</span>
+                    <label class="relative inline-flex items-center cursor-pointer">
+                        <input type="checkbox" id="modeToggle" class="sr-only peer" checked>
+                        <div class="w-14 h-7 bg-slate-600 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-6 after:w-6 after:transition-all peer-checked:bg-blue-500"></div>
+                        <span class="ml-3 text-sm font-bold text-white" id="modeLabel">Automático</span>
+                    </label>
+                </div>
+
+                <!-- Manual Controls -->
+                <div id="manualControls" class="flex-1 opacity-50 pointer-events-none transition-opacity duration-300">
+                    <p class="text-sm text-slate-400 mb-4 uppercase font-semibold">Gatillo Manual de Alertas</p>
+                    <div class="grid grid-cols-1 gap-3">
+                        <button onclick="setAlert('BLANCA', true)" class="py-3 px-4 bg-slate-200 hover:bg-white text-slate-900 font-bold rounded-lg shadow transition-colors border border-slate-400">
+                            ALERTA BLANCA
+                        </button>
+                        <button onclick="setAlert('VERDE', true)" class="py-3 px-4 bg-green-600 hover:bg-green-500 text-white font-bold rounded-lg shadow transition-colors">
+                            ALERTA VERDE
+                        </button>
+                        <button onclick="setAlert('AMARILLA', true)" class="py-3 px-4 bg-yellow-600 hover:bg-yellow-500 text-white font-bold rounded-lg shadow transition-colors">
+                            ALERTA AMARILLA
+                        </button>
+                        <button onclick="setAlert('ROJA', true)" class="py-3 px-4 bg-red-700 hover:bg-red-600 text-white font-bold rounded-lg shadow transition-colors flex justify-center items-center gap-2">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+                            ALERTA ROJA (SIRENA)
+                        </button>
+                    </div>
+                </div>
+
+                <div class="mt-6 text-xs text-slate-500 bg-slate-900 p-3 rounded-lg">
+                    <p class="font-bold mb-1">Lógica Auto:</p>
+                    <ul class="list-disc pl-4 space-y-1">
+                        <li>ΔP/Δt ≥ 0.75 o Lluvia ≥ 10 → Blanca/Verde</li>
+                        <li>ΔP/Δt ≥ 0.75 + Humedad ≥ 85% → Amarilla</li>
+                        <li>Amarilla Activa + Acel. ≥ 1.5 → ROJA</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // DOM Elements
+        const simHumedad = document.getElementById('simHumedad');
+        const valHumedad = document.getElementById('valHumedad');
+        const simLluvia = document.getElementById('simLluvia');
+        const valLluvia = document.getElementById('valLluvia');
+        const simDeltaP = document.getElementById('simDeltaP');
+        const valDeltaP = document.getElementById('valDeltaP');
+        const simAcel = document.getElementById('simAcel');
+        const valAcel = document.getElementById('valAcel');
+        const simPresion = document.getElementById('simPresion');
+        const valPresion = document.getElementById('valPresion');
+        const simConteo = document.getElementById('simConteo');
+        const valConteo = document.getElementById('valConteo');
+        
+        const modeToggle = document.getElementById('modeToggle');
+        const modeLabel = document.getElementById('modeLabel');
+        const manualControls = document.getElementById('manualControls');
+        const alertBanner = document.getElementById('alertBanner');
+
+        // State
+        let isAuto = true;
+        let currentAlertState = 'NORMAL';
+
+        // Styles map for alerts
+        const alertStyles = {
+            'NORMAL': 'bg-slate-700 text-slate-300 border-slate-600 animate-none shadow-none',
+            'BLANCA': 'bg-white text-slate-900 border-slate-300 animate-none shadow-[0_0_15px_rgba(255,255,255,0.5)]',
+            'VERDE': 'bg-green-500 text-white border-green-400 animate-none shadow-[0_0_15px_rgba(34,197,94,0.5)]',
+            'AMARILLA': 'bg-yellow-500 text-slate-900 border-yellow-400 animate-none shadow-[0_0_15px_rgba(234,179,8,0.5)]',
+            'ROJA': 'bg-red-600 text-white border-red-400 animate-pulse-fast shadow-[0_0_25px_rgba(220,38,38,0.8)]'
+        };
+
+        // Update Text values when sliders move
+        function setupBind(slider, display, isFloat = false) {
+            slider.addEventListener('input', (e) => {
+                display.innerText = isFloat ? parseFloat(e.target.value).toFixed(2) : e.target.value;
+                if(isAuto) evaluateAutomaticLogic();
+            });
+        }
+
+        setupBind(simHumedad, valHumedad);
+        setupBind(simLluvia, valLluvia, true);
+        setupBind(simDeltaP, valDeltaP, true);
+        setupBind(simAcel, valAcel, true);
+        setupBind(simPresion, valPresion);
+        setupBind(simConteo, valConteo);
+
+        // Toggle Mode
+        modeToggle.addEventListener('change', (e) => {
+            isAuto = e.target.checked;
+            modeLabel.innerText = isAuto ? 'Automático' : 'Manual';
+            
+            if(isAuto) {
+                manualControls.classList.add('opacity-50', 'pointer-events-none');
+                evaluateAutomaticLogic();
+            } else {
+                manualControls.classList.remove('opacity-50', 'pointer-events-none');
+            }
+        });
+
+        // Set Alert UI
+        function setAlert(level, manualOverride = false) {
+            if(!isAuto && !manualOverride) return; // Prevent auto logic overriding manual state
+            
+            if(currentAlertState === level && !manualOverride) return;
+            currentAlertState = level;
+
+            // Reset classes
+            alertBanner.className = `mt-4 md:mt-0 px-8 py-3 rounded-xl font-bold text-xl tracking-wider uppercase alert-transition border-2 ${alertStyles[level]}`;
+            alertBanner.innerHTML = `ESTADO: ${level === 'NORMAL' ? 'Monitoreo Normal' : 'ALERTA ' + level}`;
+        }
+
+        // Automatic Logic processing
+        function evaluateAutomaticLogic() {
+            if(!isAuto) return;
+
+            const h = parseFloat(simHumedad.value);
+            const r = parseFloat(simLluvia.value);
+            const dp = parseFloat(simDeltaP.value);
+            const a = parseFloat(simAcel.value);
+
+            let newAlert = 'NORMAL';
+
+            // Regla 1: Blanca / Verde
+            if (dp >= 0.75 || r >= 10) {
+                newAlert = (r >= 10) ? 'VERDE' : 'BLANCA'; // Lluvia fuerte = Verde, solo presion = Blanca
+            }
+
+            // Regla 2: Amarilla (Humedad alta + Caída barométrica)
+            if (dp >= 0.75 && h >= 85) {
+                newAlert = 'AMARILLA';
+            }
+
+            // Regla 3: Roja (Alerta Amarilla previa + Vibración sísmica)
+            if (newAlert === 'AMARILLA' && a >= 1.5) {
+                newAlert = 'ROJA';
+            }
+
+            setAlert(newAlert);
+        }
+
+        // Initial Evaluation
+        evaluateAutomaticLogic();
+
+    </script>
+</body>
+</html>
