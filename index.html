@@ -191,11 +191,9 @@
 
   <script>
     // ----------------------------------------------------
-    // CONFIGURACIÓN FIREBASE Y TELEGRAM
+    // CONFIGURACIÓN FIREBASE (Sin credenciales de Telegram expuestas)
     // ----------------------------------------------------
     const FIREBASE_URL = "https://huayco-alert-default-rtdb.firebaseio.com";
-    const BOT_TOKEN    = "";
-    const CHAT_ID      = "7704830866";
 
     let ultimoUptimeVisto = -1;
 
@@ -361,39 +359,38 @@
     // Ordenar al ESP32 desde la web que envíe el reporte completo a Telegram
     async function solicitarReporteESP() {
       try {
-        await fetch(`${FIREBASE_URL}/comando_web.json`, {
+        const res = await fetch(`${FIREBASE_URL}/comando_web.json`, {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify("reporte")
         });
-        agregarLog("📡 Orden enviada al ESP32: enviará reporte completo a Telegram en 2s.");
+        if (res.ok) {
+          agregarLog("📡 Orden enviada al ESP32: enviará reporte completo a Telegram en 2s.");
+        } else {
+          agregarLog("❌ Error al escribir orden de reporte en Firebase.");
+        }
       } catch (e) {
         agregarLog("❌ Error al enviar orden a Firebase.");
       }
     }
 
-    // Enviar alerta de evacuación manual directa desde la página web a Telegram
+    // Enviar orden a Firebase para que el ESP32 dispare la alerta de evacuación en Telegram
     async function enviarAlertaManualTelegram() {
       if (!confirm("¿Confirmas emitir una ALERTA DE EVACUACIÓN MANUAL al grupo de Telegram del poblado?")) return;
 
-      const mensaje = "🚨🔴 *ALERTA DE EVACUACIÓN MANUAL — CENTRO DE CONTROL WEB* 🔴🚨\n\n" +
-                      "📍 *Zona:* Poblado Santa Eulalia Alta — Prov. Huarochirí\n" +
-                      "⚠️ *Aviso:* El operador del sistema ha activado la alerta preventiva de huayco.\n" +
-                      "🏃‍♂️ *Acción:* Dirigirse inmediatamente a las zonas altas de seguridad.";
-
       try {
-        const res = await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
-          method: "POST",
+        const res = await fetch(`${FIREBASE_URL}/comando_web.json`, {
+          method: "PUT",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ chat_id: CHAT_ID, text: mensaje, parse_mode: "Markdown" })
+          body: JSON.stringify("alerta_manual")
         });
         if (res.ok) {
-          agregarLog("🚨 Alerta manual de evacuación enviada con éxito a Telegram.");
+          agregarLog("🚨 Orden de alerta manual enviada a Firebase. El ESP32 notificará a Telegram en 2s.");
         } else {
-          agregarLog("❌ Telegram rechazó el envío. Verifica el Bot Token.");
+          agregarLog("❌ Error al escribir la orden en Firebase.");
         }
       } catch (e) {
-        agregarLog("❌ Error de conexión al contactar con Telegram.");
+        agregarLog("❌ Error de red al contactar con Firebase.");
       }
     }
 
