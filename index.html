@@ -1,292 +1,404 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Huayco ALERT - Dashboard</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    fontFamily: {
-                        sans: ['Inter', 'sans-serif'],
-                    },
-                    colors: {
-                        darkbg: '#0f172a',
-                        cardbg: '#1e293b',
-                    },
-                    animation: {
-                        'pulse-fast': 'pulse 1s cubic-bezier(0.4, 0, 0.6, 1) infinite',
-                    }
-                }
-            }
-        }
-    </script>
-    <style>
-        /* Custom range slider styling */
-        input[type=range] {
-            -webkit-appearance: none;
-            width: 100%;
-            background: transparent;
-        }
-        input[type=range]::-webkit-slider-thumb {
-            -webkit-appearance: none;
-            height: 16px;
-            width: 16px;
-            border-radius: 50%;
-            background: #3b82f6;
-            cursor: pointer;
-            margin-top: -6px;
-            box-shadow: 0 0 5px rgba(0,0,0,0.5);
-        }
-        input[type=range]::-webkit-slider-runnable-track {
-            width: 100%;
-            height: 4px;
-            cursor: pointer;
-            background: #475569;
-            border-radius: 2px;
-        }
-        .alert-transition {
-            transition: all 0.3s ease-in-out;
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SAT-Huaycos | Centro de Monitoreo CENEPRED / SENAMHI</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap');
+    body { font-family: 'Inter', sans-serif; background-color: #0b1120; color: #f1f5f9; }
+    .mono { font-family: 'JetBrains Mono', monospace; }
+    .glass-card { background: rgba(15, 23, 42, 0.88); border: 1px solid rgba(51, 65, 85, 0.7); backdrop-filter: blur(10px); }
+    @keyframes pulse-border { 0%, 100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.5); } 50% { box-shadow: 0 0 0 8px rgba(239, 68, 68, 0); } }
+    .alert-pulse { animation: pulse-border 2s infinite; }
+  </style>
 </head>
-<body class="bg-darkbg text-slate-200 min-h-screen p-4 md:p-8">
+<body class="min-h-screen flex flex-col">
 
-    <div class="max-w-6xl mx-auto space-y-6">
-        <!-- Header -->
-        <header class="flex flex-col md:flex-row justify-between items-center bg-cardbg p-6 rounded-2xl shadow-lg border border-slate-700">
-            <div>
-                <h1 class="text-3xl font-bold text-white tracking-tight">Huayco <span class="text-blue-500">ALERT</span></h1>
-                <p class="text-slate-400 text-sm mt-1">Centro de Monitoreo Distribuido (ESP-NOW) - Hito 2</p>
-            </div>
-            
-            <!-- Alert State Banner -->
-            <div id="alertBanner" class="mt-4 md:mt-0 px-8 py-3 rounded-xl font-bold text-xl tracking-wider uppercase alert-transition bg-slate-700 text-slate-300 border-2 border-slate-600">
-                Estado: Normal
-            </div>
-        </header>
-
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            
-            <!-- Telemetry Section -->
-            <div class="lg:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-4">
-                
-                <!-- Card: Humedad -->
-                <div class="bg-cardbg p-5 rounded-2xl border border-slate-700 shadow-md">
-                    <div class="flex justify-between items-center mb-2">
-                        <span class="text-sm font-semibold text-slate-400 uppercase">Humedad Suelo Profundo</span>
-                        <svg class="w-5 h-5 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"></path></svg>
-                    </div>
-                    <div class="text-3xl font-bold text-white mb-4"><span id="valHumedad">45</span> <span class="text-lg text-slate-500">%</span></div>
-                    <input type="range" id="simHumedad" min="0" max="100" value="45" class="w-full">
-                </div>
-
-                <!-- Card: Lluvia -->
-                <div class="bg-cardbg p-5 rounded-2xl border border-slate-700 shadow-md">
-                    <div class="flex justify-between items-center mb-2">
-                        <span class="text-sm font-semibold text-slate-400 uppercase">Intensidad Lluvia</span>
-                        <svg class="w-5 h-5 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z"></path></svg>
-                    </div>
-                    <div class="text-3xl font-bold text-white mb-4"><span id="valLluvia">0.0</span> <span class="text-lg text-slate-500">mm/h</span></div>
-                    <input type="range" id="simLluvia" min="0" max="50" step="0.5" value="0" class="w-full">
-                </div>
-
-                <!-- Card: Variacion Presion -->
-                <div class="bg-cardbg p-5 rounded-2xl border border-slate-700 shadow-md">
-                    <div class="flex justify-between items-center mb-2">
-                        <span class="text-sm font-semibold text-slate-400 uppercase">Pendiente Barométrica (ΔP/Δt)</span>
-                        <svg class="w-5 h-5 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 17h8m0 0V9m0 8l-8-8-4 4-6-6"></path></svg>
-                    </div>
-                    <div class="text-3xl font-bold text-white mb-4"><span id="valDeltaP">0.20</span> <span class="text-lg text-slate-500">hPa/h</span></div>
-                    <input type="range" id="simDeltaP" min="0" max="3" step="0.05" value="0.2" class="w-full">
-                </div>
-
-                <!-- Card: Aceleracion -->
-                <div class="bg-cardbg p-5 rounded-2xl border border-slate-700 shadow-md">
-                    <div class="flex justify-between items-center mb-2">
-                        <span class="text-sm font-semibold text-slate-400 uppercase">Aceleración Suelo (MPU6050)</span>
-                        <svg class="w-5 h-5 text-orange-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
-                    </div>
-                    <div class="text-3xl font-bold text-white mb-4"><span id="valAcel">0.1</span> <span class="text-lg text-slate-500">m/s²</span></div>
-                    <input type="range" id="simAcel" min="0" max="5" step="0.1" value="0.1" class="w-full">
-                </div>
-
-                <!-- Card: Presion Absoluta -->
-                <div class="bg-cardbg p-5 rounded-2xl border border-slate-700 shadow-md">
-                    <div class="flex justify-between items-center mb-2">
-                        <span class="text-sm font-semibold text-slate-400 uppercase">Presión Absoluta</span>
-                        <span class="text-slate-500 text-xs">Info Extra</span>
-                    </div>
-                    <div class="text-3xl font-bold text-white mb-4"><span id="valPresion">1012</span> <span class="text-lg text-slate-500">hPa</span></div>
-                    <input type="range" id="simPresion" min="950" max="1050" value="1012" class="w-full">
-                </div>
-
-                <!-- Card: Eventos Lluvia -->
-                <div class="bg-cardbg p-5 rounded-2xl border border-slate-700 shadow-md">
-                    <div class="flex justify-between items-center mb-2">
-                        <span class="text-sm font-semibold text-slate-400 uppercase">Frecuencia Lluvia</span>
-                        <span class="text-slate-500 text-xs">Eventos</span>
-                    </div>
-                    <div class="text-3xl font-bold text-white mb-4"><span id="valConteo">0</span></div>
-                    <input type="range" id="simConteo" min="0" max="100" value="0" class="w-full">
-                </div>
-
-            </div>
-
-            <!-- Control Section -->
-            <div class="bg-cardbg p-6 rounded-2xl border border-slate-700 shadow-md flex flex-col">
-                <h2 class="text-xl font-bold text-white mb-6 border-b border-slate-600 pb-2">Panel de Control</h2>
-                
-                <!-- Toggle Mode -->
-                <div class="flex items-center justify-between mb-8 bg-slate-900 p-4 rounded-xl border border-slate-700">
-                    <span class="font-semibold text-slate-300">Modo de Evaluación</span>
-                    <label class="relative inline-flex items-center cursor-pointer">
-                        <input type="checkbox" id="modeToggle" class="sr-only peer" checked>
-                        <div class="w-14 h-7 bg-slate-600 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-6 after:w-6 after:transition-all peer-checked:bg-blue-500"></div>
-                        <span class="ml-3 text-sm font-bold text-white" id="modeLabel">Automático</span>
-                    </label>
-                </div>
-
-                <!-- Manual Controls -->
-                <div id="manualControls" class="flex-1 opacity-50 pointer-events-none transition-opacity duration-300">
-                    <p class="text-sm text-slate-400 mb-4 uppercase font-semibold">Gatillo Manual de Alertas</p>
-                    <div class="grid grid-cols-1 gap-3">
-                        <button onclick="setAlert('BLANCA', true)" class="py-3 px-4 bg-slate-200 hover:bg-white text-slate-900 font-bold rounded-lg shadow transition-colors border border-slate-400">
-                            ALERTA BLANCA
-                        </button>
-                        <button onclick="setAlert('VERDE', true)" class="py-3 px-4 bg-green-600 hover:bg-green-500 text-white font-bold rounded-lg shadow transition-colors">
-                            ALERTA VERDE
-                        </button>
-                        <button onclick="setAlert('AMARILLA', true)" class="py-3 px-4 bg-yellow-600 hover:bg-yellow-500 text-white font-bold rounded-lg shadow transition-colors">
-                            ALERTA AMARILLA
-                        </button>
-                        <button onclick="setAlert('ROJA', true)" class="py-3 px-4 bg-red-700 hover:bg-red-600 text-white font-bold rounded-lg shadow transition-colors flex justify-center items-center gap-2">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
-                            ALERTA ROJA (SIRENA)
-                        </button>
-                    </div>
-                </div>
-
-                <div class="mt-6 text-xs text-slate-500 bg-slate-900 p-3 rounded-lg">
-                    <p class="font-bold mb-1">Lógica Auto:</p>
-                    <ul class="list-disc pl-4 space-y-1">
-                        <li>ΔP/Δt ≥ 0.75 o Lluvia ≥ 10 → Blanca/Verde</li>
-                        <li>ΔP/Δt ≥ 0.75 + Humedad ≥ 85% → Amarilla</li>
-                        <li>Amarilla Activa + Acel. ≥ 1.5 → ROJA</li>
-                    </ul>
-                </div>
-            </div>
+  <!-- Barra Superior -->
+  <header class="border-b border-slate-800 bg-slate-950/90 sticky top-0 z-30">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 py-3 flex flex-wrap items-center justify-between gap-4">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-xl bg-amber-500/20 border border-amber-500/40 flex items-center justify-center text-amber-400 font-bold text-lg">
+          ⚠️
         </div>
+        <div>
+          <div class="flex items-center gap-2">
+            <h1 class="font-extrabold text-base sm:text-lg tracking-tight text-white">SAT-HUAYCOS PERÚ</h1>
+            <span class="px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider rounded bg-sky-500/20 text-sky-300 border border-sky-500/30">
+              CENEPRED / SENAMHI
+            </span>
+          </div>
+          <p class="text-xs text-slate-400">Estación Quebrada San Pedro — Poblado Santa Eulalia Alta, Prov. Huarochirí</p>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-3">
+        <div id="fbStatus" class="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-slate-900 border border-slate-800 text-xs">
+          <span id="fbDot" class="w-2.5 h-2.5 rounded-full bg-amber-400 animate-pulse"></span>
+          <span id="fbText" class="text-slate-300 font-medium">Conectando a Firebase...</span>
+        </div>
+        <div class="hidden sm:block text-right">
+          <div id="reloj" class="mono text-sm font-bold text-slate-200">--:--:--</div>
+          <div class="text-[11px] text-slate-500">Tiempo Real (PET)</div>
+        </div>
+      </div>
     </div>
+  </header>
 
-    <script>
-        // DOM Elements
-        const simHumedad = document.getElementById('simHumedad');
-        const valHumedad = document.getElementById('valHumedad');
-        const simLluvia = document.getElementById('simLluvia');
-        const valLluvia = document.getElementById('valLluvia');
-        const simDeltaP = document.getElementById('simDeltaP');
-        const valDeltaP = document.getElementById('valDeltaP');
-        const simAcel = document.getElementById('simAcel');
-        const valAcel = document.getElementById('valAcel');
-        const simPresion = document.getElementById('simPresion');
-        const valPresion = document.getElementById('valPresion');
-        const simConteo = document.getElementById('simConteo');
-        const valConteo = document.getElementById('valConteo');
-        
-        const modeToggle = document.getElementById('modeToggle');
-        const modeLabel = document.getElementById('modeLabel');
-        const manualControls = document.getElementById('manualControls');
-        const alertBanner = document.getElementById('alertBanner');
+  <main class="max-w-7xl mx-auto w-full px-4 sm:px-6 py-6 flex-1 space-y-6">
 
-        // State
-        let isAuto = true;
-        let currentAlertState = 'NORMAL';
+    <!-- Banner de Nivel de Peligro Oficial -->
+    <section id="bannerRiesgo" class="rounded-2xl p-5 border border-emerald-500/40 bg-emerald-950/30 transition-all duration-300">
+      <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div class="flex items-start gap-4">
+          <div id="semaforoBadge" class="px-4 py-2 rounded-xl font-extrabold text-sm uppercase tracking-wider bg-emerald-500 text-slate-950 shrink-0">
+            NIVEL 1 • VERDE
+          </div>
+          <div>
+            <h2 id="tituloDiagnostico" class="text-lg sm:text-xl font-bold text-white">PELIGRO BAJO — CONDICIÓN ESTABLE</h2>
+            <p id="descDiagnostico" class="text-sm text-slate-300 mt-0.5">
+              Esperando primera lectura en vivo desde la estación ESP32 vía Firebase Realtime Database.
+            </p>
+          </div>
+        </div>
+        <div class="flex flex-wrap gap-2 shrink-0">
+          <button onclick="solicitarReporteESP()" class="px-4 py-2.5 rounded-xl bg-sky-600 hover:bg-sky-500 text-white font-semibold text-xs sm:text-sm transition flex items-center gap-2">
+            📡 Solicitar Reporte ESP32
+          </button>
+          <button onclick="enviarAlertaManualTelegram()" class="px-4 py-2.5 rounded-xl bg-red-600 hover:bg-red-500 text-white font-bold text-xs sm:text-sm transition flex items-center gap-2 shadow-lg shadow-red-950/50">
+            🚨 Emitir Alerta Manual
+          </button>
+        </div>
+      </div>
+    </section>
 
-        // Styles map for alerts
-        const alertStyles = {
-            'NORMAL': 'bg-slate-700 text-slate-300 border-slate-600 animate-none shadow-none',
-            'BLANCA': 'bg-white text-slate-900 border-slate-300 animate-none shadow-[0_0_15px_rgba(255,255,255,0.5)]',
-            'VERDE': 'bg-green-500 text-white border-green-400 animate-none shadow-[0_0_15px_rgba(34,197,94,0.5)]',
-            'AMARILLA': 'bg-yellow-500 text-slate-900 border-yellow-400 animate-none shadow-[0_0_15px_rgba(234,179,8,0.5)]',
-            'ROJA': 'bg-red-600 text-white border-red-400 animate-pulse-fast shadow-[0_0_25px_rgba(220,38,38,0.8)]'
-        };
+    <!-- Tarjetas de Sensores en Tiempo Real -->
+    <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <!-- Humedad Superficie D35 -->
+      <div class="glass-card rounded-2xl p-5">
+        <div class="flex justify-between items-center text-xs text-slate-400 mb-2">
+          <span>🌱 SATURACIÓN SUPERFICIE (D35)</span>
+          <span class="mono text-[11px] text-slate-500">Capa 1</span>
+        </div>
+        <div class="flex items-baseline gap-2">
+          <span id="valSup" class="mono text-3xl font-extrabold text-white">--</span>
+          <span class="text-slate-400 font-semibold">%</span>
+        </div>
+        <div class="w-full bg-slate-800 h-2.5 rounded-full mt-3 overflow-hidden relative">
+          <div class="absolute left-[55%] top-0 bottom-0 w-0.5 bg-amber-400 z-10" title="Quiebre crítico SENAMHI 55%"></div>
+          <div id="barSup" class="h-full bg-emerald-500 transition-all duration-500" style="width: 0%"></div>
+        </div>
+        <p id="lblSup" class="text-xs text-slate-400 mt-2">Sin datos aún</p>
+      </div>
 
-        // Update Text values when sliders move
-        function setupBind(slider, display, isFloat = false) {
-            slider.addEventListener('input', (e) => {
-                display.innerText = isFloat ? parseFloat(e.target.value).toFixed(2) : e.target.value;
-                if(isAuto) evaluateAutomaticLogic();
-            });
+      <!-- Humedad Media D26 -->
+      <div class="glass-card rounded-2xl p-5">
+        <div class="flex justify-between items-center text-xs text-slate-400 mb-2">
+          <span>🌿 FILTRO MEDIO (D26)</span>
+          <span class="mono text-[11px] text-slate-500">Capa 2</span>
+        </div>
+        <div class="flex items-baseline gap-2">
+          <span id="valMed" class="mono text-3xl font-extrabold text-white">--</span>
+          <span class="text-slate-400 font-semibold">%</span>
+        </div>
+        <div class="w-full bg-slate-800 h-2.5 rounded-full mt-3 overflow-hidden">
+          <div id="barMed" class="h-full bg-emerald-500 transition-all duration-500" style="width: 0%"></div>
+        </div>
+        <p id="lblMed" class="text-xs text-slate-400 mt-2">Sin datos aún</p>
+      </div>
+
+      <!-- Humedad Profunda D25 -->
+      <div class="glass-card rounded-2xl p-5">
+        <div class="flex justify-between items-center text-xs text-slate-400 mb-2">
+          <span>🪵 ESTRATO PROFUNDO (D25)</span>
+          <span class="mono text-[11px] text-slate-500">Capa 3</span>
+        </div>
+        <div class="flex items-baseline gap-2">
+          <span id="valInf" class="mono text-3xl font-extrabold text-white">--</span>
+          <span class="text-slate-400 font-semibold">%</span>
+        </div>
+        <div class="w-full bg-slate-800 h-2.5 rounded-full mt-3 overflow-hidden">
+          <div id="barInf" class="h-full bg-emerald-500 transition-all duration-500" style="width: 0%"></div>
+        </div>
+        <p id="lblInf" class="text-xs text-slate-400 mt-2">Sin datos aún</p>
+      </div>
+
+      <!-- Vibración Neta MPU-6050 -->
+      <div class="glass-card rounded-2xl p-5">
+        <div class="flex justify-between items-center text-xs text-slate-400 mb-2">
+          <span>📳 VIBRACIÓN NETA (MPU-6050)</span>
+          <span class="mono text-[11px] text-amber-400">Umbral: 1.80</span>
+        </div>
+        <div class="flex items-baseline gap-2">
+          <span id="valVib" class="mono text-3xl font-extrabold text-white">--</span>
+          <span class="text-slate-400 font-semibold text-sm">m/s²</span>
+        </div>
+        <div class="w-full bg-slate-800 h-2.5 rounded-full mt-3 overflow-hidden">
+          <div id="barVib" class="h-full bg-sky-500 transition-all duration-300" style="width: 0%"></div>
+        </div>
+        <p id="lblVib" class="text-xs text-slate-400 mt-2">Esperando sensor...</p>
+      </div>
+    </section>
+
+    <!-- Fila Inferior: Gráfico Histórico + Condiciones Atmosféricas y Bitácora -->
+    <section class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <!-- Gráfico en Tiempo Real -->
+      <div class="glass-card rounded-2xl p-5 lg:col-span-2">
+        <div class="flex items-center justify-between mb-4">
+          <div>
+            <h3 class="font-bold text-white text-sm sm:text-base">Evolución de Saturación de Suelo y Vibración</h3>
+            <p class="text-xs text-slate-400">Lecturas recibidas en vivo desde Firebase Realtime Database</p>
+          </div>
+          <span class="text-[11px] px-2.5 py-1 rounded bg-slate-800 text-slate-300 mono">Quiebre SENAMHI: 55%</span>
+        </div>
+        <div class="h-64">
+          <canvas id="chartTelemetria"></canvas>
+        </div>
+      </div>
+
+      <!-- Panel Derecho: BMP180 + Registro de Eventos -->
+      <div class="space-y-6">
+        <div class="glass-card rounded-2xl p-5">
+          <h3 class="font-bold text-white text-sm mb-3">🌤️ Variables Atmosféricas (BMP180)</h3>
+          <div class="grid grid-cols-2 gap-3">
+            <div class="p-3 rounded-xl bg-slate-900/90 border border-slate-800">
+              <div class="text-xs text-slate-400">Temperatura</div>
+              <div class="mono text-xl font-bold text-amber-400 mt-1"><span id="valTemp">--</span> °C</div>
+            </div>
+            <div class="p-3 rounded-xl bg-slate-900/90 border border-slate-800">
+              <div class="text-xs text-slate-400">Presión Atm.</div>
+              <div class="mono text-xl font-bold text-sky-400 mt-1"><span id="valPres">--</span> hPa</div>
+            </div>
+          </div>
+          <div class="mt-3 pt-3 border-t border-slate-800 flex justify-between text-xs text-slate-400">
+            <span>Tiempo encendido ESP32:</span>
+            <span id="valUptime" class="mono text-slate-200">-- s</span>
+          </div>
+        </div>
+
+        <div class="glass-card rounded-2xl p-5">
+          <h3 class="font-bold text-white text-sm mb-3">📋 Bitácora de Operaciones</h3>
+          <div id="logLista" class="space-y-2 max-h-44 overflow-y-auto text-xs font-mono text-slate-300">
+            <div class="text-slate-500">Iniciando escucha de base de datos...</div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    // ----------------------------------------------------
+    // CONFIGURACIÓN FIREBASE Y TELEGRAM
+    // ----------------------------------------------------
+    const FIREBASE_URL = "https://huayco-alert-default-rtdb.firebaseio.com";
+    const BOT_TOKEN    = "8674555014:AAGL20ET0CoUQK1_E9FjOXnhJqBfO6Dc-KY";
+    const CHAT_ID      = "7704830866";
+
+    let ultimoUptimeVisto = -1;
+
+    // Reloj local
+    setInterval(() => {
+      document.getElementById("reloj").textContent = new Date().toLocaleTimeString("es-PE");
+    }, 1000);
+
+    function agregarLog(texto) {
+      const lista = document.getElementById("logLista");
+      const hora = new Date().toLocaleTimeString("es-PE");
+      const item = document.createElement("div");
+      item.className = "p-2 rounded bg-slate-900/90 border border-slate-800/80";
+      item.innerHTML = `<span class="text-slate-500">[${hora}]</span> ${texto}`;
+      lista.prepend(item);
+      if (lista.children.length > 15) lista.removeChild(lista.lastChild);
+    }
+
+    // Configurar gráfico Chart.js
+    const ctx = document.getElementById("chartTelemetria").getContext("2d");
+    const chart = new Chart(ctx, {
+      type: "line",
+      data: {
+        labels: [],
+        datasets: [
+          { label: "Superficie D35 (%)", data: [], borderColor: "#38bdf8", backgroundColor: "rgba(56,189,248,0.1)", tension: 0.3, fill: true },
+          { label: "Medio D26 (%)", data: [], borderColor: "#34d399", tension: 0.3 },
+          { label: "Profundo D25 (%)", data: [], borderColor: "#a78bfa", tension: 0.3 }
+        ]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+          y: { min: 0, max: 100, grid: { color: "rgba(51,65,85,0.4)" }, ticks: { color: "#94a3b8" } },
+          x: { grid: { display: false }, ticks: { color: "#94a3b8", maxTicksLimit: 8 } }
+        },
+        plugins: { legend: { labels: { color: "#e2e8f0", font: { size: 11 } } } }
+      }
+    });
+
+    function colorBarra(pct) {
+      if (pct >= 80) return "bg-red-500";
+      if (pct >= 60) return "bg-orange-500";
+      if (pct >= 40) return "bg-amber-400";
+      return "bg-emerald-500";
+    }
+
+    function textoNivelHumedad(pct) {
+      if (pct >= 80) return "🔴 Saturado (Nivel 4 - Extremo)";
+      if (pct >= 60) return "🟠 Húmedo crítico (Nivel 3 - Alto)";
+      if (pct >= 55) return "🟡 Supera quiebre 55% SENAMHI";
+      if (pct >= 40) return "🟡 Húmedo estable (Nivel 2 - Moderado)";
+      return "🟢 Seco / Infiltración normal (Nivel 1)";
+    }
+
+    function actualizarSemaforo(sup, vib, diagTexto) {
+      const banner = document.getElementById("bannerRiesgo");
+      const badge  = document.getElementById("semaforoBadge");
+      const titulo = document.getElementById("tituloDiagnostico");
+      const desc   = document.getElementById("descDiagnostico");
+
+      banner.classList.remove("alert-pulse");
+
+      if (sup >= 80 || (sup >= 60 && vib >= 1.8)) {
+        banner.className = "rounded-2xl p-5 border border-red-500 bg-red-950/40 transition-all alert-pulse";
+        badge.className  = "px-4 py-2 rounded-xl font-extrabold text-sm uppercase tracking-wider bg-red-600 text-white shrink-0";
+        badge.textContent = "NIVEL 4 • ROJO";
+        titulo.textContent = diagTexto || "PELIGRO MUY ALTO — DETONACIÓN INMINENTE";
+        desc.textContent = "Suelo sobresaturado (supera Límite Líquido). Evacuación preventiva inmediata hacia zonas altas.";
+      } else if (sup >= 60 || (sup >= 40 && vib >= 1.8)) {
+        banner.className = "rounded-2xl p-5 border border-orange-500/60 bg-orange-950/30 transition-all";
+        badge.className  = "px-4 py-2 rounded-xl font-extrabold text-sm uppercase tracking-wider bg-orange-500 text-slate-950 shrink-0";
+        badge.textContent = "NIVEL 3 • NARANJA";
+        titulo.textContent = diagTexto || "PELIGRO ALTO — INFILTRACIÓN ACTIVA";
+        desc.textContent = "Pérdida de cohesión en laderas y reactivación de cárcavas. Mantener vigilancia constante.";
+      } else if (sup >= 40 || vib >= 1.8) {
+        banner.className = "rounded-2xl p-5 border border-amber-500/50 bg-amber-950/30 transition-all";
+        badge.className  = "px-4 py-2 rounded-xl font-extrabold text-sm uppercase tracking-wider bg-amber-400 text-slate-950 shrink-0";
+        badge.textContent = "NIVEL 2 • AMARILLO";
+        titulo.textContent = diagTexto || "PELIGRO MEDIO — MONITOREO ACTIVO";
+        desc.textContent = sup >= 55 ? "Atención: se superó el umbral de quiebre mecánico del 55% (SENAMHI)." : "Suelo húmedo estable dentro del límite seguro.";
+      } else {
+        banner.className = "rounded-2xl p-5 border border-emerald-500/40 bg-emerald-950/30 transition-all";
+        badge.className  = "px-4 py-2 rounded-xl font-extrabold text-sm uppercase tracking-wider bg-emerald-500 text-slate-950 shrink-0";
+        badge.textContent = "NIVEL 1 • VERDE";
+        titulo.textContent = diagTexto || "PELIGRO BAJO — CONDICIÓN NORMAL";
+        desc.textContent = "Suelo seco a levemente húmedo sin vibraciones anómalas detectadas en la quebrada.";
+      }
+    }
+
+    // Lectura continua desde Firebase Realtime Database cada 2 segundos
+    async function leerFirebase() {
+      try {
+        const res = await fetch(`${FIREBASE_URL}/estacion.json`);
+        const data = await res.json();
+
+        const dot = document.getElementById("fbDot");
+        const txt = document.getElementById("fbText");
+
+        if (!data) {
+          dot.className = "w-2.5 h-2.5 rounded-full bg-amber-400";
+          txt.textContent = "Firebase listo (Esperando ESP32)";
+          return;
         }
 
-        setupBind(simHumedad, valHumedad);
-        setupBind(simLluvia, valLluvia, true);
-        setupBind(simDeltaP, valDeltaP, true);
-        setupBind(simAcel, valAcel, true);
-        setupBind(simPresion, valPresion);
-        setupBind(simConteo, valConteo);
+        dot.className = "w-2.5 h-2.5 rounded-full bg-emerald-400";
+        txt.textContent = data.uptime_sec !== ultimoUptimeVisto ? "ESP32 En Línea (Vivo)" : "Último dato guardado";
+        ultimoUptimeVisto = data.uptime_sec;
 
-        // Toggle Mode
-        modeToggle.addEventListener('change', (e) => {
-            isAuto = e.target.checked;
-            modeLabel.innerText = isAuto ? 'Automático' : 'Manual';
-            
-            if(isAuto) {
-                manualControls.classList.add('opacity-50', 'pointer-events-none');
-                evaluateAutomaticLogic();
-            } else {
-                manualControls.classList.remove('opacity-50', 'pointer-events-none');
-            }
+        const sup = data.humedad_sup ?? 0;
+        const med = data.humedad_med ?? 0;
+        const inf = data.humedad_inf ?? 0;
+        const vib = data.vibracion ?? 0;
+
+        document.getElementById("valSup").textContent = sup;
+        document.getElementById("barSup").style.width = `${sup}%`;
+        document.getElementById("barSup").className = `h-full transition-all duration-500 ${colorBarra(sup)}`;
+        document.getElementById("lblSup").textContent = textoNivelHumedad(sup);
+
+        document.getElementById("valMed").textContent = med;
+        document.getElementById("barMed").style.width = `${med}%`;
+        document.getElementById("barMed").className = `h-full transition-all duration-500 ${colorBarra(med)}`;
+        document.getElementById("lblMed").textContent = textoNivelHumedad(med);
+
+        document.getElementById("valInf").textContent = inf;
+        document.getElementById("barInf").style.width = `${inf}%`;
+        document.getElementById("barInf").className = `h-full transition-all duration-500 ${colorBarra(inf)}`;
+        document.getElementById("lblInf").textContent = textoNivelHumedad(inf);
+
+        document.getElementById("valVib").textContent = vib.toFixed(2);
+        const pctVib = Math.min((vib / 3.0) * 100, 100);
+        document.getElementById("barVib").style.width = `${pctVib}%`;
+        document.getElementById("barVib").className = `h-full transition-all duration-300 ${vib >= 1.8 ? "bg-red-500" : "bg-sky-500"}`;
+        document.getElementById("lblVib").textContent = data.mpu_activo
+          ? (vib >= 1.8 ? "🚨 ¡VIBRACIÓN CRÍTICA DETECTADA!" : "✅ Terreno estable (0.00 - 1.79 m/s²)")
+          : "⚠️ Sensor MPU-6050 desconectado";
+
+        document.getElementById("valTemp").textContent = data.bmp_activo ? data.temperatura.toFixed(1) : "N/A";
+        document.getElementById("valPres").textContent = data.bmp_activo ? data.presion.toFixed(1) : "N/A";
+        document.getElementById("valUptime").textContent = `${data.uptime_sec ?? 0} s`;
+
+        actualizarSemaforo(sup, vib, data.diagnostico);
+
+        // Actualizar gráfico
+        const hora = new Date().toLocaleTimeString("es-PE");
+        chart.data.labels.push(hora);
+        chart.data.datasets[0].data.push(sup);
+        chart.data.datasets[1].data.push(med);
+        chart.data.datasets[2].data.push(inf);
+        if (chart.data.labels.length > 20) {
+          chart.data.labels.shift();
+          chart.data.datasets.forEach(d => d.data.shift());
+        }
+        chart.update();
+
+      } catch (err) {
+        document.getElementById("fbDot").className = "w-2.5 h-2.5 rounded-full bg-red-500";
+        document.getElementById("fbText").textContent = "Error de red con Firebase";
+      }
+    }
+
+    // Ordenar al ESP32 desde la web que envíe el reporte completo a Telegram
+    async function solicitarReporteESP() {
+      try {
+        await fetch(`${FIREBASE_URL}/comando_web.json`, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify("reporte")
         });
+        agregarLog("📡 Orden enviada al ESP32: enviará reporte completo a Telegram en 2s.");
+      } catch (e) {
+        agregarLog("❌ Error al enviar orden a Firebase.");
+      }
+    }
 
-        // Set Alert UI
-        function setAlert(level, manualOverride = false) {
-            if(!isAuto && !manualOverride) return; // Prevent auto logic overriding manual state
-            
-            if(currentAlertState === level && !manualOverride) return;
-            currentAlertState = level;
+    // Enviar alerta de evacuación manual directa desde la página web a Telegram
+    async function enviarAlertaManualTelegram() {
+      if (!confirm("¿Confirmas emitir una ALERTA DE EVACUACIÓN MANUAL al grupo de Telegram del poblado?")) return;
 
-            // Reset classes
-            alertBanner.className = `mt-4 md:mt-0 px-8 py-3 rounded-xl font-bold text-xl tracking-wider uppercase alert-transition border-2 ${alertStyles[level]}`;
-            alertBanner.innerHTML = `ESTADO: ${level === 'NORMAL' ? 'Monitoreo Normal' : 'ALERTA ' + level}`;
+      const mensaje = "🚨🔴 *ALERTA DE EVACUACIÓN MANUAL — CENTRO DE CONTROL WEB* 🔴🚨\n\n" +
+                      "📍 *Zona:* Poblado Santa Eulalia Alta — Prov. Huarochirí\n" +
+                      "⚠️ *Aviso:* El operador del sistema ha activado la alerta preventiva de huayco.\n" +
+                      "🏃‍♂️ *Acción:* Dirigirse inmediatamente a las zonas altas de seguridad.";
+
+      try {
+        const res = await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ chat_id: CHAT_ID, text: mensaje, parse_mode: "Markdown" })
+        });
+        if (res.ok) {
+          agregarLog("🚨 Alerta manual de evacuación enviada con éxito a Telegram.");
+        } else {
+          agregarLog("❌ Telegram rechazó el envío. Verifica el Bot Token.");
         }
+      } catch (e) {
+        agregarLog("❌ Error de conexión al contactar con Telegram.");
+      }
+    }
 
-        // Automatic Logic processing
-        function evaluateAutomaticLogic() {
-            if(!isAuto) return;
-
-            const h = parseFloat(simHumedad.value);
-            const r = parseFloat(simLluvia.value);
-            const dp = parseFloat(simDeltaP.value);
-            const a = parseFloat(simAcel.value);
-
-            let newAlert = 'NORMAL';
-
-            // Regla 1: Blanca / Verde
-            if (dp >= 0.75 || r >= 10) {
-                newAlert = (r >= 10) ? 'VERDE' : 'BLANCA'; // Lluvia fuerte = Verde, solo presion = Blanca
-            }
-
-            // Regla 2: Amarilla (Humedad alta + Caída barométrica)
-            if (dp >= 0.75 && h >= 85) {
-                newAlert = 'AMARILLA';
-            }
-
-            // Regla 3: Roja (Alerta Amarilla previa + Vibración sísmica)
-            if (newAlert === 'AMARILLA' && a >= 1.5) {
-                newAlert = 'ROJA';
-            }
-
-            setAlert(newAlert);
-        }
-
-        // Initial Evaluation
-        evaluateAutomaticLogic();
-
-    </script>
+    setInterval(leerFirebase, 2000);
+    leerFirebase();
+  </script>
 </body>
 </html>
