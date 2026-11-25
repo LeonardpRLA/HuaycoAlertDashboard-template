@@ -28,7 +28,7 @@
           <div class="flex items-center gap-2">
             <h1 class="font-extrabold text-base sm:text-lg tracking-tight text-white">SAT-HUAYCOS PERÚ</h1>
             <span class="px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider rounded bg-sky-500/20 text-sky-300 border border-sky-500/30">
-              CENEPRED / SENAMHI
+              RED MULTINODO • CENEPRED / SENAMHI
             </span>
           </div>
           <p class="text-xs text-slate-400">Estación Quebrada San Pedro — Poblado Santa Eulalia Alta, Prov. Huarochirí</p>
@@ -60,7 +60,7 @@
           <div>
             <h2 id="tituloDiagnostico" class="text-lg sm:text-xl font-bold text-white">PELIGRO BAJO — CONDICIÓN ESTABLE</h2>
             <p id="descDiagnostico" class="text-sm text-slate-300 mt-0.5">
-              Esperando primera lectura en vivo desde la estación ESP32 vía Firebase Realtime Database.
+              Esperando primera lectura en vivo desde la red ESP-NOW vía Firebase Realtime Database.
             </p>
           </div>
         </div>
@@ -77,11 +77,11 @@
 
     <!-- Tarjetas de Sensores en Tiempo Real -->
     <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-      <!-- Humedad Superficie D35 -->
+      <!-- Saturación Cima (Nodo 1) -->
       <div class="glass-card rounded-2xl p-5">
         <div class="flex justify-between items-center text-xs text-slate-400 mb-2">
-          <span>🌱 SATURACIÓN SUPERFICIE (D35)</span>
-          <span class="mono text-[11px] text-slate-500">Capa 1</span>
+          <span>🏔️ SATURACIÓN CIMA (NODO 1)</span>
+          <span id="detN1" class="mono text-[11px] text-slate-500">--/--/--%</span>
         </div>
         <div class="flex items-baseline gap-2">
           <span id="valSup" class="mono text-3xl font-extrabold text-white">--</span>
@@ -94,33 +94,35 @@
         <p id="lblSup" class="text-xs text-slate-400 mt-2">Sin datos aún</p>
       </div>
 
-      <!-- Humedad Media D26 -->
+      <!-- Saturación Zona Media (Nodo 2) -->
       <div class="glass-card rounded-2xl p-5">
         <div class="flex justify-between items-center text-xs text-slate-400 mb-2">
-          <span>🌿 FILTRO MEDIO (D26)</span>
-          <span class="mono text-[11px] text-slate-500">Capa 2</span>
+          <span>⛰️ ZONA INTERMEDIA (NODO 2)</span>
+          <span id="detN2" class="mono text-[11px] text-slate-500">--/--/--%</span>
         </div>
         <div class="flex items-baseline gap-2">
           <span id="valMed" class="mono text-3xl font-extrabold text-white">--</span>
           <span class="text-slate-400 font-semibold">%</span>
         </div>
-        <div class="w-full bg-slate-800 h-2.5 rounded-full mt-3 overflow-hidden">
+        <div class="w-full bg-slate-800 h-2.5 rounded-full mt-3 overflow-hidden relative">
+          <div class="absolute left-[55%] top-0 bottom-0 w-0.5 bg-amber-400 z-10" title="Quiebre crítico SENAMHI 55%"></div>
           <div id="barMed" class="h-full bg-emerald-500 transition-all duration-500" style="width: 0%"></div>
         </div>
         <p id="lblMed" class="text-xs text-slate-400 mt-2">Sin datos aún</p>
       </div>
 
-      <!-- Humedad Profunda D25 -->
+      <!-- Pico Crítico de Saturación -->
       <div class="glass-card rounded-2xl p-5">
         <div class="flex justify-between items-center text-xs text-slate-400 mb-2">
-          <span>🪵 ESTRATO PROFUNDO (D25)</span>
-          <span class="mono text-[11px] text-slate-500">Capa 3</span>
+          <span>💧 PICO MÁXIMO EN SUELO</span>
+          <span class="mono text-[11px] text-slate-500">6 Sensores</span>
         </div>
         <div class="flex items-baseline gap-2">
           <span id="valInf" class="mono text-3xl font-extrabold text-white">--</span>
           <span class="text-slate-400 font-semibold">%</span>
         </div>
-        <div class="w-full bg-slate-800 h-2.5 rounded-full mt-3 overflow-hidden">
+        <div class="w-full bg-slate-800 h-2.5 rounded-full mt-3 overflow-hidden relative">
+          <div class="absolute left-[55%] top-0 bottom-0 w-0.5 bg-amber-400 z-10" title="Quiebre crítico SENAMHI 55%"></div>
           <div id="barInf" class="h-full bg-emerald-500 transition-all duration-500" style="width: 0%"></div>
         </div>
         <p id="lblInf" class="text-xs text-slate-400 mt-2">Sin datos aún</p>
@@ -130,7 +132,7 @@
       <div class="glass-card rounded-2xl p-5">
         <div class="flex justify-between items-center text-xs text-slate-400 mb-2">
           <span>📳 VIBRACIÓN NETA (MPU-6050)</span>
-          <span class="mono text-[11px] text-amber-400">Umbral: 1.80</span>
+          <span class="mono text-[11px] text-amber-400">Umbral: 1.50</span>
         </div>
         <div class="flex items-baseline gap-2">
           <span id="valVib" class="mono text-3xl font-extrabold text-white">--</span>
@@ -149,7 +151,7 @@
       <div class="glass-card rounded-2xl p-5 lg:col-span-2">
         <div class="flex items-center justify-between mb-4">
           <div>
-            <h3 class="font-bold text-white text-sm sm:text-base">Evolución de Saturación de Suelo y Vibración</h3>
+            <h3 class="font-bold text-white text-sm sm:text-base">Evolución de Saturación de Suelo (Cima vs. Zona Media)</h3>
             <p class="text-xs text-slate-400">Lecturas recibidas en vivo desde Firebase Realtime Database</p>
           </div>
           <span class="text-[11px] px-2.5 py-1 rounded bg-slate-800 text-slate-300 mono">Quiebre SENAMHI: 55%</span>
@@ -159,23 +161,23 @@
         </div>
       </div>
 
-      <!-- Panel Derecho: BMP180 + Registro de Eventos -->
+      <!-- Panel Derecho: BMP180 + Lluvia + Registro de Eventos -->
       <div class="space-y-6">
         <div class="glass-card rounded-2xl p-5">
-          <h3 class="font-bold text-white text-sm mb-3">🌤️ Variables Atmosféricas (BMP180)</h3>
+          <h3 class="font-bold text-white text-sm mb-3">🌤️ Variables Hidrometeorológicas (Nodo 1)</h3>
           <div class="grid grid-cols-2 gap-3">
             <div class="p-3 rounded-xl bg-slate-900/90 border border-slate-800">
-              <div class="text-xs text-slate-400">Temperatura</div>
-              <div class="mono text-xl font-bold text-amber-400 mt-1"><span id="valTemp">--</span> °C</div>
+              <div class="text-xs text-slate-400">Intensidad Lluvia</div>
+              <div class="mono text-xl font-bold text-sky-400 mt-1"><span id="valLluvia">--</span> mm/h</div>
             </div>
             <div class="p-3 rounded-xl bg-slate-900/90 border border-slate-800">
-              <div class="text-xs text-slate-400">Presión Atm.</div>
-              <div class="mono text-xl font-bold text-sky-400 mt-1"><span id="valPres">--</span> hPa</div>
+              <div class="text-xs text-slate-400">Presión BMP180</div>
+              <div class="mono text-xl font-bold text-amber-400 mt-1"><span id="valPres">--</span> hPa</div>
             </div>
           </div>
           <div class="mt-3 pt-3 border-t border-slate-800 flex justify-between text-xs text-slate-400">
-            <span>Tiempo encendido ESP32:</span>
-            <span id="valUptime" class="mono text-slate-200">-- s</span>
+            <span>Paquete ESP-NOW recibido:</span>
+            <span id="valUptime" class="mono text-slate-200">#--</span>
           </div>
         </div>
 
@@ -190,14 +192,12 @@
   </main>
 
   <script>
-    // ----------------------------------------------------
-    // CONFIGURACIÓN FIREBASE (Sin credenciales de Telegram expuestas)
-    // ----------------------------------------------------
     const FIREBASE_URL = "https://huayco-alert-default-rtdb.firebaseio.com";
 
-    let ultimoUptimeVisto = -1;
+    let ultimaSecuenciaVista = -1;
+    let ultimoTimestampVisto = -1;
+    let ciclosSinCambio = 0;
 
-    // Reloj local
     setInterval(() => {
       document.getElementById("reloj").textContent = new Date().toLocaleTimeString("es-PE");
     }, 1000);
@@ -212,16 +212,15 @@
       if (lista.children.length > 15) lista.removeChild(lista.lastChild);
     }
 
-    // Configurar gráfico Chart.js
     const ctx = document.getElementById("chartTelemetria").getContext("2d");
     const chart = new Chart(ctx, {
       type: "line",
       data: {
         labels: [],
         datasets: [
-          { label: "Superficie D35 (%)", data: [], borderColor: "#38bdf8", backgroundColor: "rgba(56,189,248,0.1)", tension: 0.3, fill: true },
-          { label: "Medio D26 (%)", data: [], borderColor: "#34d399", tension: 0.3 },
-          { label: "Profundo D25 (%)", data: [], borderColor: "#a78bfa", tension: 0.3 }
+          { label: "Cima Nodo 1 (%)", data: [], borderColor: "#38bdf8", backgroundColor: "rgba(56,189,248,0.1)", tension: 0.3, fill: true },
+          { label: "Medio Nodo 2 (%)", data: [], borderColor: "#34d399", tension: 0.3 },
+          { label: "Pico Máximo (%)", data: [], borderColor: "#a78bfa", tension: 0.3 }
         ]
       },
       options: {
@@ -243,14 +242,14 @@
     }
 
     function textoNivelHumedad(pct) {
-      if (pct >= 80) return "🔴 Saturado (Nivel 4 - Extremo)";
-      if (pct >= 60) return "🟠 Húmedo crítico (Nivel 3 - Alto)";
+      if (pct >= 80) return "🔴 Saturado (Nivel 4 - Crítico)";
+      if (pct >= 60) return "🟠 Húmedo alto (Nivel 3 - Alerta)";
       if (pct >= 55) return "🟡 Supera quiebre 55% SENAMHI";
-      if (pct >= 40) return "🟡 Húmedo estable (Nivel 2 - Moderado)";
+      if (pct >= 30) return "🟡 Moderado (Nivel 2 - Vigilancia)";
       return "🟢 Seco / Infiltración normal (Nivel 1)";
     }
 
-    function actualizarSemaforo(sup, vib, diagTexto) {
+    function actualizarSemaforo(nivelESP, maxHum, vib, lluvia) {
       const banner = document.getElementById("bannerRiesgo");
       const badge  = document.getElementById("semaforoBadge");
       const titulo = document.getElementById("tituloDiagnostico");
@@ -258,34 +257,34 @@
 
       banner.classList.remove("alert-pulse");
 
-      if (sup >= 80 || (sup >= 60 && vib >= 1.8)) {
+      // Prioriza el nivel calculado por los nodos ESP32 o los umbrales críticos
+      if (nivelESP >= 4 || maxHum >= 85 || (maxHum >= 75 && vib >= 1.5)) {
         banner.className = "rounded-2xl p-5 border border-red-500 bg-red-950/40 transition-all alert-pulse";
         badge.className  = "px-4 py-2 rounded-xl font-extrabold text-sm uppercase tracking-wider bg-red-600 text-white shrink-0";
         badge.textContent = "NIVEL 4 • ROJO";
-        titulo.textContent = diagTexto || "PELIGRO MUY ALTO — DETONACIÓN INMINENTE";
-        desc.textContent = "Suelo sobresaturado (supera Límite Líquido). Evacuación preventiva inmediata hacia zonas altas.";
-      } else if (sup >= 60 || (sup >= 40 && vib >= 1.8)) {
+        titulo.textContent = "PELIGRO MUY ALTO — DETONACIÓN INMINENTE DE HUAYCO";
+        desc.textContent = "Suelo sobresaturado y/o flujo detectado en quebrada. Evacuación preventiva inmediata hacia zonas altas.";
+      } else if (nivelESP === 3 || maxHum >= 80 || lluvia >= 15.0 || vib >= 0.8) {
         banner.className = "rounded-2xl p-5 border border-orange-500/60 bg-orange-950/30 transition-all";
         badge.className  = "px-4 py-2 rounded-xl font-extrabold text-sm uppercase tracking-wider bg-orange-500 text-slate-950 shrink-0";
         badge.textContent = "NIVEL 3 • NARANJA";
-        titulo.textContent = diagTexto || "PELIGRO ALTO — INFILTRACIÓN ACTIVA";
+        titulo.textContent = "PELIGRO ALTO — SATURACIÓN / INFILTRACIÓN ACTIVA";
         desc.textContent = "Pérdida de cohesión en laderas y reactivación de cárcavas. Mantener vigilancia constante.";
-      } else if (sup >= 40 || vib >= 1.8) {
+      } else if (nivelESP === 2 || maxHum >= 55 || lluvia >= 5.0) {
         banner.className = "rounded-2xl p-5 border border-amber-500/50 bg-amber-950/30 transition-all";
         badge.className  = "px-4 py-2 rounded-xl font-extrabold text-sm uppercase tracking-wider bg-amber-400 text-slate-950 shrink-0";
         badge.textContent = "NIVEL 2 • AMARILLO";
-        titulo.textContent = diagTexto || "PELIGRO MEDIO — MONITOREO ACTIVO";
-        desc.textContent = sup >= 55 ? "Atención: se superó el umbral de quiebre mecánico del 55% (SENAMHI)." : "Suelo húmedo estable dentro del límite seguro.";
+        titulo.textContent = "PELIGRO MEDIO — MONITOREO ACTIVO";
+        desc.textContent = maxHum >= 55 ? "Atención: se superó el umbral de quiebre mecánico del 55% (SENAMHI)." : "Lluvia leve o suelo húmedo estable dentro del límite seguro.";
       } else {
         banner.className = "rounded-2xl p-5 border border-emerald-500/40 bg-emerald-950/30 transition-all";
         badge.className  = "px-4 py-2 rounded-xl font-extrabold text-sm uppercase tracking-wider bg-emerald-500 text-slate-950 shrink-0";
         badge.textContent = "NIVEL 1 • VERDE";
-        titulo.textContent = diagTexto || "PELIGRO BAJO — CONDICIÓN NORMAL";
+        titulo.textContent = "PELIGRO BAJO — CONDICIÓN ESTABLE";
         desc.textContent = "Suelo seco a levemente húmedo sin vibraciones anómalas detectadas en la quebrada.";
       }
     }
 
-    // Lectura continua desde Firebase Realtime Database cada 2 segundos
     async function leerFirebase() {
       try {
         const res = await fetch(`${FIREBASE_URL}/estacion.json`);
@@ -296,54 +295,95 @@
 
         if (!data) {
           dot.className = "w-2.5 h-2.5 rounded-full bg-amber-400";
-          txt.textContent = "Firebase listo (Esperando ESP32)";
+          txt.textContent = "Firebase listo (Esperando Gateway N3)";
           return;
         }
 
-        dot.className = "w-2.5 h-2.5 rounded-full bg-emerald-400";
-        txt.textContent = data.uptime_sec !== ultimoUptimeVisto ? "ESP32 En Línea (Vivo)" : "Último dato guardado";
-        ultimoUptimeVisto = data.uptime_sec;
+        // Detectar actividad real por secuencia, timestamp o bandera online/activo
+        const seq = data.secuencia ?? 0;
+        const ts  = data.ultima_actualizacion ?? 0;
+        const cambio = (seq !== ultimaSecuenciaVista) || (ts !== ultimoTimestampVisto);
 
-        const sup = data.humedad_sup ?? 0;
-        const med = data.humedad_med ?? 0;
-        const inf = data.humedad_inf ?? 0;
-        const vib = data.vibracion ?? 0;
+        if (cambio) {
+          ciclosSinCambio = 0;
+          if (ultimaSecuenciaVista !== -1 && seq !== ultimaSecuenciaVista) {
+            agregarLog(`📥 Paquete #${seq} recibido | Cima: ${Math.round(data.humedad_cima ?? 0)}% | Media: ${Math.round(data.humedad_media ?? 0)}% | Alerta: ${data.estado_alerta ?? "BLANCA"}`);
+          }
+          ultimaSecuenciaVista = seq;
+          ultimoTimestampVisto = ts;
+        } else {
+          ciclosSinCambio++;
+        }
 
-        document.getElementById("valSup").textContent = sup;
-        document.getElementById("barSup").style.width = `${sup}%`;
-        document.getElementById("barSup").className = `h-full transition-all duration-500 ${colorBarra(sup)}`;
-        document.getElementById("lblSup").textContent = textoNivelHumedad(sup);
+        // Si el Gateway actualizó hace menos de 16 segundos (8 ciclos de 2s) o está marcado activo
+        const estaVivo = (ciclosSinCambio < 8) || (data.online === true && ciclosSinCambio < 12);
+        if (estaVivo) {
+          dot.className = "w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse";
+          txt.textContent = "Gateway ESP32 En Línea (Vivo)";
+        } else {
+          dot.className = "w-2.5 h-2.5 rounded-full bg-amber-400";
+          txt.textContent = "Último dato guardado (En espera)";
+        }
 
-        document.getElementById("valMed").textContent = med;
-        document.getElementById("barMed").style.width = `${med}%`;
-        document.getElementById("barMed").className = `h-full transition-all duration-500 ${colorBarra(med)}`;
-        document.getElementById("lblMed").textContent = textoNivelHumedad(med);
+        // Leer los 6 sensores individuales y promedios que envía el Nodo 3
+        const h1_n1 = Number(data.hum1_n1 ?? 0);
+        const h2_n1 = Number(data.hum2_n1 ?? 0);
+        const h3_n1 = Number(data.hum3_n1 ?? 0);
+        const promN1 = Math.round(Number(data.humedad_cima ?? ((h1_n1 + h2_n1 + h3_n1) / 3)));
 
-        document.getElementById("valInf").textContent = inf;
-        document.getElementById("barInf").style.width = `${inf}%`;
-        document.getElementById("barInf").className = `h-full transition-all duration-500 ${colorBarra(inf)}`;
-        document.getElementById("lblInf").textContent = textoNivelHumedad(inf);
+        const h1_n2 = Number(data.hum1_n2 ?? 0);
+        const h2_n2 = Number(data.hum2_n2 ?? 0);
+        const h3_n2 = Number(data.hum3_n2 ?? 0);
+        const promN2 = Math.round(Number(data.humedad_media ?? ((h1_n2 + h2_n2 + h3_n2) / 3)));
 
+        const maxSuelo = Math.max(h1_n1, h2_n1, h3_n1, h1_n2, h2_n2, h3_n2);
+        const vib      = Number(data.vibracion_ms2 ?? 0);
+        const lluvia   = Number(data.lluvia_mmh ?? 0);
+        const presion  = Number(data.presion_hpa ?? 0);
+        const nivelESP = Number(data.nivel_alerta ?? 1);
+
+        // Tarjeta 1: Cima (Nodo 1)
+        document.getElementById("valSup").textContent = promN1;
+        document.getElementById("detN1").textContent = `${h1_n1}/${h2_n1}/${h3_n1}%`;
+        document.getElementById("barSup").style.width = `${Math.min(promN1, 100)}%`;
+        document.getElementById("barSup").className = `h-full transition-all duration-500 ${colorBarra(promN1)}`;
+        document.getElementById("lblSup").textContent = data.saturacion_cima ? `Estado: ${data.saturacion_cima}` : textoNivelHumedad(promN1);
+
+        // Tarjeta 2: Zona Media (Nodo 2)
+        document.getElementById("valMed").textContent = promN2;
+        document.getElementById("detN2").textContent = `${h1_n2}/${h2_n2}/${h3_n2}%`;
+        document.getElementById("barMed").style.width = `${Math.min(promN2, 100)}%`;
+        document.getElementById("barMed").className = `h-full transition-all duration-500 ${colorBarra(promN2)}`;
+        document.getElementById("lblMed").textContent = data.saturacion_media ? `Estado: ${data.saturacion_media}` : textoNivelHumedad(promN2);
+
+        // Tarjeta 3: Pico Máximo en Suelo
+        document.getElementById("valInf").textContent = maxSuelo;
+        document.getElementById("barInf").style.width = `${Math.min(maxSuelo, 100)}%`;
+        document.getElementById("barInf").className = `h-full transition-all duration-500 ${colorBarra(maxSuelo)}`;
+        document.getElementById("lblInf").textContent = textoNivelHumedad(maxSuelo);
+
+        // Tarjeta 4: Vibración MPU-6050
         document.getElementById("valVib").textContent = vib.toFixed(2);
         const pctVib = Math.min((vib / 3.0) * 100, 100);
         document.getElementById("barVib").style.width = `${pctVib}%`;
-        document.getElementById("barVib").className = `h-full transition-all duration-300 ${vib >= 1.8 ? "bg-red-500" : "bg-sky-500"}`;
-        document.getElementById("lblVib").textContent = data.mpu_activo
-          ? (vib >= 1.8 ? "🚨 ¡VIBRACIÓN CRÍTICA DETECTADA!" : "✅ Terreno estable (0.00 - 1.79 m/s²)")
-          : "⚠️ Sensor MPU-6050 desconectado";
+        document.getElementById("barVib").className = `h-full transition-all duration-300 ${vib >= 1.5 ? "bg-red-500" : "bg-sky-500"}`;
+        document.getElementById("lblVib").textContent = vib >= 1.5
+          ? "🚨 ¡VIBRACIÓN CRÍTICA DETECTADA!"
+          : "✅ Terreno estable en Nodo 2";
 
-        document.getElementById("valTemp").textContent = data.bmp_activo ? data.temperatura.toFixed(1) : "N/A";
-        document.getElementById("valPres").textContent = data.bmp_activo ? data.presion.toFixed(1) : "N/A";
-        document.getElementById("valUptime").textContent = `${data.uptime_sec ?? 0} s`;
+        // Variables Hidrometeorológicas (Lluvia + BMP180)
+        document.getElementById("valLluvia").textContent = lluvia.toFixed(1);
+        document.getElementById("valPres").textContent = presion > 0 ? presion.toFixed(1) : "N/A";
+        document.getElementById("valUptime").textContent = `#${seq}`;
 
-        actualizarSemaforo(sup, vib, data.diagnostico);
+        actualizarSemaforo(nivelESP, maxSuelo, vib, lluvia);
 
         // Actualizar gráfico
         const hora = new Date().toLocaleTimeString("es-PE");
         chart.data.labels.push(hora);
-        chart.data.datasets[0].data.push(sup);
-        chart.data.datasets[1].data.push(med);
-        chart.data.datasets[2].data.push(inf);
+        chart.data.datasets[0].data.push(promN1);
+        chart.data.datasets[1].data.push(promN2);
+        chart.data.datasets[2].data.push(maxSuelo);
         if (chart.data.labels.length > 20) {
           chart.data.labels.shift();
           chart.data.datasets.forEach(d => d.data.shift());
@@ -356,7 +396,6 @@
       }
     }
 
-    // Ordenar al ESP32 desde la web que envíe el reporte completo a Telegram
     async function solicitarReporteESP() {
       try {
         const res = await fetch(`${FIREBASE_URL}/comando_web.json`, {
@@ -365,7 +404,7 @@
           body: JSON.stringify("reporte")
         });
         if (res.ok) {
-          agregarLog("📡 Orden enviada al ESP32: enviará reporte completo a Telegram en 2s.");
+          agregarLog("📡 Orden 'reporte' enviada a Firebase para el Gateway (Nodo 3).");
         } else {
           agregarLog("❌ Error al escribir orden de reporte en Firebase.");
         }
@@ -374,9 +413,8 @@
       }
     }
 
-    // Enviar orden a Firebase para que el ESP32 dispare la alerta de evacuación en Telegram
     async function enviarAlertaManualTelegram() {
-      if (!confirm("¿Confirmas emitir una ALERTA DE EVACUACIÓN MANUAL al grupo de Telegram del poblado?")) return;
+      if (!confirm("¿Confirmas emitir una ALERTA DE EVACUACIÓN MANUAL al grupo del poblado?")) return;
 
       try {
         const res = await fetch(`${FIREBASE_URL}/comando_web.json`, {
@@ -385,7 +423,7 @@
           body: JSON.stringify("alerta_manual")
         });
         if (res.ok) {
-          agregarLog("🚨 Orden de alerta manual enviada a Firebase. El ESP32 notificará a Telegram en 2s.");
+          agregarLog("🚨 Orden 'alerta_manual' enviada a Firebase.");
         } else {
           agregarLog("❌ Error al escribir la orden en Firebase.");
         }
